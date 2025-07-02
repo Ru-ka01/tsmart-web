@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type ChangeEvent } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -31,23 +31,50 @@ export default function CompanyBusForm() {
 
   const [loading, setLoading] = useState(false);
 
-  const handleCompanyChange = (e) => {
+  const handleCompanyChange = (e: { target: { name: any; value: any } }) => {
     setCompanyInfo({
       ...companyInfo,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleBusChange = (index, e) => {
-    const updatedBuses = [...buses];
-    updatedBuses[index][e.target.name] = e.target.value;
-    setBuses(updatedBuses);
+  type BusKey = "plateNumber" | "manufacturer" | "capacity";
+
+  const handleBusChange = (index: number, e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    if (["plateNumber", "manufacturer", "capacity"].includes(name)) {
+      const updatedBuses = [...buses];
+      updatedBuses[index][name as BusKey] = value;
+      setBuses(updatedBuses);
+    }
   };
 
-  const handleRouteChange = (busIndex, routeIndex, e) => {
-    const updatedBuses = [...buses];
-    updatedBuses[busIndex].routes[routeIndex][e.target.name] = e.target.value;
-    setBuses(updatedBuses);
+  type RouteKey =
+    | "origin"
+    | "destination"
+    | "price"
+    | "depatureTime"
+    | "arrivalTime";
+
+  const handleRouteChange = (
+    busIndex: number,
+    routeIndex: number,
+    e: ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, value } = e.target;
+    if (
+      [
+        "origin",
+        "destination",
+        "price",
+        "depatureTime",
+        "arrivalTime",
+      ].includes(name)
+    ) {
+      const updatedBuses = [...buses];
+      updatedBuses[busIndex].routes[routeIndex][name as RouteKey] = value;
+      setBuses(updatedBuses);
+    }
   };
 
   const addBus = () => {
@@ -70,12 +97,12 @@ export default function CompanyBusForm() {
     ]);
   };
 
-  const removeBus = (index) => {
+  const removeBus = (index: number) => {
     const updatedBuses = buses.filter((_, i) => i !== index);
     setBuses(updatedBuses);
   };
 
-  const addRoute = (busIndex) => {
+  const addRoute = (busIndex: number) => {
     const updatedBuses = [...buses];
     updatedBuses[busIndex].routes.push({
       origin: "",
@@ -87,13 +114,13 @@ export default function CompanyBusForm() {
     setBuses(updatedBuses);
   };
 
-  const removeRoute = (busIndex, routeIndex) => {
+  const removeRoute = (busIndex: number, routeIndex: number) => {
     const updatedBuses = [...buses];
     updatedBuses[busIndex].routes.splice(routeIndex, 1);
     setBuses(updatedBuses);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
     setLoading(true);
 
